@@ -716,3 +716,68 @@ def jn_zeros(n, k, method="sympy", dps=15):
         root = solver(f, root + pi)
         roots.append(root)
     return roots
+
+class Airyai(AiryBase):
+
+    nargs = 1
+
+    @classmethod
+    def eval(cls, z):
+        from sympy import gamma
+        if re(z).is_zero and im(z).is_zero:
+            return 1/(C.Pow(3, 2/3)*gamma(2/3))
+
+        if re(z) is S.Infinity or re(z) is S.NegativeInfinity:
+            return S.Zero
+
+    def _eval_rewrite_as_besseli(self, z):
+        a = C.Pow(z, 3/2)
+        if re(z).is_positive:
+            return (1/3)*sqrt(z)*(besseli(-(1/3),(2/3)*a)
+                    - besseli((1/3),(2/3)*a))
+        else:
+            b = C.Pow(a, 1/3)
+            d = C.Pow(a, -(1/3))
+            return (1/3)*(b*besseli(-(1/3), (2/3)*a)
+                    - z*d*besseli((1/3), (2/3)*a))
+
+    def _eval_rewrite_as_besselj(self, z):
+        b = C.Pow(-z, 3/2)
+        if re(z).is_negative:
+            return (1/3)*sqrt(-z)*(besselj((1/3), (2/3)*b)
+                    + besselj(-(1/3), (2/3)*b))
+
+
+class Airybi(AiryBase):
+
+    nargs = 1
+
+    @classmethod
+    def eval(cls, z):
+        from sympy import gamma
+        if re(z).is_zero and im(z).is_zero:
+            return 1/(C.Pow(3, 1/6)*gamma(2/3))
+
+        if re(z) is S.Infinity:
+            return S.Infinity
+
+        if re(z) is S.NegativeInfinity:
+            return S.Zero
+
+    def _eval_rewrite_as_besseli(self, z):
+        a = C.Pow(z, 3/2)
+        if re(z).is_positive:
+            return sqrt(z/3)*((besseli(1/3), (2/3)*a)
+                    + besseli((-1/3), (2/3)*a))
+
+        else:
+            b = C.Pow(a, 1/3)
+            d = C.Pow(a, -(1/3))
+            return sqrt(1/3)*(b*besseli(-(1/3), (2/3)*a)
+                    + z*d*besseli((1/3), (2/3)*a))
+
+    def _eval_rewrite_as_besselj(self, z):
+        b = C.Pow(-z,3/2)
+        if re(z).is_negative:
+            return sqrt(-z/3)*(besselj(-(1/3),(2/3)*b)
+                    - besselj((1/3),(2/3)*b))
